@@ -1,5 +1,4 @@
 var score = 0;
-var statust = "Beep. Press Z to jump, X to switch gravity.";
 var gravity = 1; //either -1 or 1, gravity can flip
 var pY = 1; //player's Y position
 var grounded = 0; //whether player is in air or grounded
@@ -13,6 +12,7 @@ var animateDelay = 0; //i rreally need to stop with the globals
 var player = document.getElementById('player');
 var gameFrame = document.getElementById('gameFrame');
 var scrollingStuff = document.getElementsByClassName('scroll');
+var statusBar = document.getElementById('status');
 
 
 
@@ -100,21 +100,14 @@ var graphics = function(){
 
 var blockSpawn = function(){
 counters.blockD = counters.blockD + 1;
-if(counters.blockD == 199){
+if(counters.blockD >= 149){
 	blocks.push(new blockDefault());
 	var div = document.createElement("div");
 	var q = blocks.length - 1;
 	div.style.left = blocks[q].x + 'px';
 	div.style.height = blocks[q].height + 'px';
-	
-	console.log(blocks[q].orientation);
-	if(blocks[q].orientation == 1){
-		div.style.top = '10px';
-		}
-	else{
-		div.style.top = gameHeight - blocks[q].height + 'px';
-		}
-	
+	if(blocks[q].orientation == 1){div.style.top = '10px';}
+	else{div.style.top = gameHeight - blocks[q].height + 'px';}
 	div.setAttribute('class', 'block');
 	div.setAttribute('id', 'block' + q);
 	gameFrame.appendChild(div);
@@ -122,7 +115,7 @@ if(counters.blockD == 199){
 	}
 }
 
-var blockMove = function(){ //and checks for collission with player?
+var blockMove = function(){
 for(var i = 0; i < blocks.length;i++){
 	var movex = function(){
 		x = x - 1;
@@ -148,19 +141,42 @@ for(var i = 0; i < blocks.length;i++){
 			movex();
 			obj.style.width = gameWidth - x + 'px';
 			}
+		else if(x == 30){ // player's X, checks if player is colliding
+			movex();
+			colission(x, blocks[i].height, blocks[i].orientation);
+		}
 		else{
 			movex();
-			}
+		}
 	}
 }
+}
+
+// freezes game, plays death animation, resets.
+var death = function(){
+	resetAll();
+}
+
+var colission = function(x, h, o){
+	if(o == 1){
+		//checks blocks that hang from ceiling
+		if(pY < h){death();}
+		else{score++;}
+	}
+	//checks blocks that grow from floor
+	else{
+	if(pY > gameHeight - h){death();}
+	else{score++}
+	}
 }
 
 var update = function(){
 	gravitate();
 	blockSpawn();
-	if(blocks.length > 0){blockMove();}
+	blockMove();
 	bulletMove();
 	graphics();
+	statusBar.innerHTML = 'Beep. Press Z to jump, X to switch gravity. Score: ' + score;
 	time = time + 1; //time is a var used by other things but never changed anywhere else
 }
 
@@ -168,12 +184,16 @@ var update = function(){
 var int=self.setInterval(function(){update()},frameSpeed);
 
 //resets all values, like refreshing the page, called at death
-var resetall = function (){
-	var score = 0;
-	var statust = "Beep. Press Z to jump, X to switch gravity.";
-	var gravity = 1;
-	var pX = 1;
-	var pY = 1;
+var resetAll = function (){
+	score = 0;
+	statust = "Beep. Press Z to jump, X to switch gravity." + score;
+	gravity = 1;
+	pY = 1;
+	grounded = 0;
+	jumping = 0;
+	blocks = [];
+	var blockDivs = document.getElementsByClassName('block');
+	while (blockDivs[0]){gameFrame.removeChild(blockDivs[0])};
 }
  
  //inputs
@@ -184,4 +204,4 @@ window.addEventListener("keydown", function(e){
 }
 , false);
 
-resetall();
+resetAll();
