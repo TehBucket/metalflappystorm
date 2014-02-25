@@ -6,7 +6,6 @@ var jumping = 0; //whether jump lerping is going on or just falling
 var jumpLERP;
 var scroll = 0; //may be removed when i make things better
 var time = 0; //how many frames have gone by since load
-var spriteN = 4;
 var animateDelay = 0; //i rreally need to stop with the globals
 
 var player = document.getElementById('player');
@@ -27,6 +26,7 @@ gameFrame.style.width = gameWidth + 'px';
 
 var counters = { //lazy way to stop overusing globals
 blockD: 150,
+spriteN: 4,
 }
 
 var blockDefault = function(){ //will create random pillar block
@@ -60,7 +60,7 @@ var jump = function(){
 jumping = 1;
 jumpLERP = 1;
 grounded = 0;
-spriteN = 5;
+counters.spriteN = 5;
 }
 
 var flipGravity = function(){
@@ -85,10 +85,10 @@ var graphics = function(){
 	orientation = 0;
 	if(gravity==-1){orientation = 32} //32 pixels down in spritesheet is upside down version
 	if(grounded == 1 && animateDelay == 0){
-		spriteN = spriteN + 1;
-		if(spriteN >= 4){spriteN = 0;}
+		counters.spriteN = counters.spriteN + 1;
+		if(counters.spriteN >= 4){counters.spriteN = 0;}
 		}
-	player.style.backgroundPosition = (spriteN+1)*24 +1 + 'px ' + orientation + 'px'; //eww
+	player.style.backgroundPosition = (counters.spriteN+1)*24 +1 + 'px ' + orientation + 'px'; //eww
 
 	//scroll background
 	for(var i = 0; i < scrollingStuff.length;i++){
