@@ -55,3 +55,10 @@ position:fixed;
 background-image:url('images/block2.png');
 width:16px;
 }
+
+.bullet{
+position:fixed;
+background-image:url('images/bullet.png');
+width:8px;
+height:8px;
+}

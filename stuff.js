@@ -29,7 +29,8 @@ blockD: 150,
 spriteN: 4,
 }
 
-var blockDefault = function(){ //will create random pillar block
+//will create random pillar block
+var blockDefault = function(){ 
 	this.x = gameWidth;
 	this.height = Math.floor(Math.random()*(175 - 85 + 1) + 85); //thank you MDN
 	this.orientation = Math.floor(Math.random()*(1 - 0 + 1) + 0);
@@ -37,7 +38,16 @@ var blockDefault = function(){ //will create random pillar block
 	this.width = 16; //pixel width of image for scaling management and such
 }
 
+var bulletDefault = function(y, o){
+	this.y = y;
+	if(o==1){this.x = 42;}
+	else{this.x = 350;}
+	this.o = o;
+	this.alive = 1;
+}
+
 var blocks = [];
+var bullets = [];
 
 //jumping and Falling
 var gravitate = function(){
@@ -69,12 +79,35 @@ grounded = 0;
 }
 
 var bulletMove = function(){
-
+	for(var i = 0; i < bullets.length;i++){
+	if(bullets[i].alive){
+			var obj = document.getElementById('bullet' + i);
+			var x = bullets[i].x;
+			var o = bullets[i].o;
+			var movex = function(){
+				x = x + o;
+				bullets[i].x = x;
+				obj.style.left = x + 'px';
+			}
+			if(x < 0 || x > gameWidth){
+				gameFrame.removeChild(obj);
+				bullets[i].alive = 0;
+				}
+			else{movex();}
+		}
+	}
 }
 
 //creates bullet
-var shoot = function(y){
-
+var shoot = function(y, o){
+	bullets.push(new bulletDefault(y, o));
+	var div = document.createElement("div");
+	var q = bullets.length - 1;
+	div.style.left = bullets[q].x + 'px';
+	div.style.top = bullets[q].y + 'px';
+	div.setAttribute('class', 'bullet');
+	div.setAttribute('id', 'bullet' + q);
+	gameFrame.appendChild(div);
 }
 
 //changes the Graphics every update
@@ -193,6 +226,9 @@ var resetAll = function (){
 	jumping = 0;
 	blocks = [];
 	var blockDivs = document.getElementsByClassName('block');
+	while (blockDivs[0]){gameFrame.removeChild(blockDivs[0])}; //thanks stackoverflow
+	bullets = [];
+	blockDivs = document.getElementsByClassName('bullet');
 	while (blockDivs[0]){gameFrame.removeChild(blockDivs[0])};
 }
  
@@ -200,7 +236,7 @@ var resetAll = function (){
 window.addEventListener("keydown", function(e){
 	if(e.keyCode == 90){jump()}
 	else if(e.keyCode == 88){flipGravity()}
-	else if(e.keyCode == 86){shoot(pY)}
+	else if(e.keyCode == 67){shoot(pY + 32, 1)}
 }
 , false);
 
