@@ -17,7 +17,7 @@ var scrollingStuff = document.getElementsByClassName('scroll');
 
 
 //static variables to change when tweaking
-var frameSpeed = 20; // speed of update(), smaller is faster.
+var frameSpeed = 2; // speed of update(), smaller is faster.
 var scrollSpeed = -1;
 var fallSpeed = 2;
 var gameHeight = 250;
@@ -26,13 +26,13 @@ gameFrame.style.height = gameHeight + 'px';
 gameFrame.style.width = gameWidth + 'px';
 
 var counters = { //lazy way to stop overusing globals
-var blockD = 0;
+blockD: 150,
 }
 
 var blockDefault = function(){ //will create random pillar block
-	this.x = 400;
-	this.height = Math.floor(Math.random()*(75 - 35 + 1) + 35); //thank you MDN
-	this.element = document.getElementById("blocks" + blocks.length-1)
+	this.x = gameWidth;
+	this.height = Math.floor(Math.random()*(175 - 85 + 1) + 85); //thank you MDN
+	this.orientation = Math.floor(Math.random()*(1 - 0 + 1) + 0);
 	this.alive = 1;
 	this.width = 16; //pixel width of image for scaling management and such
 }
@@ -99,48 +99,54 @@ var graphics = function(){
 }
 
 var blockSpawn = function(){
-z = Math.random();
-if(z > .99){
+counters.blockD = counters.blockD + 1;
+if(counters.blockD == 199){
 	blocks.push(new blockDefault());
 	var div = document.createElement("div");
 	var q = blocks.length - 1;
-	div.style.left = blocks[q].x;
-	div.style.height = blocks[q].height;
+	div.style.left = blocks[q].x + 'px';
+	div.style.height = blocks[q].height + 'px';
+	
+	console.log(blocks[q].orientation);
+	if(blocks[q].orientation == 1){
+		div.style.top = '10px';
+		}
+	else{
+		div.style.top = gameHeight - blocks[q].height + 'px';
+		}
+	
 	div.setAttribute('class', 'block');
 	div.setAttribute('id', 'block' + q);
 	gameFrame.appendChild(div);
-	blocks[q].element = document.getElementById('block' + q);
+	counters.blockD = 0;
 	}
 }
-
-blockSpawn(); //spawning a block before update runs to avoid that bug
 
 var blockMove = function(){ //and checks for collission with player?
 for(var i = 0; i < blocks.length;i++){
 	var movex = function(){
 		x = x - 1;
 		blocks[i].x = x;
-		blocks[i].element.style.left = x + 'px';
+		obj.style.left = x + 'px';
 		}
 	if(blocks[i].alive == 1){
 		var x = blocks[i].x;
 		var w = blocks[i].width;
 		var obj = document.getElementById('block' + i);
 		if(x <= 0){
-			if(x<=-16){
+			if(x<=-w){
 				gameFrame.removeChild(obj);
 				blocks[i].alive = 0;
 				}
 			else{ //kinda scales it to fake leaving the frame
 				movex();
-				obj.style.width = 16 + x + "px";
-				obj.style.backgroundPosition = 16 + x + "px 0px";
+				obj.style.width = w + x + "px";
+				obj.style.backgroundPosition = w + x + "px 0px";
 				}
 		}
-		else if(x >=gameWidth - w){ //scales to fake entering frame
+		else if(x >= gameWidth - w){ //scales to fake entering frame
 			movex();
-			obj.style.width = ((gameWidth - w)*-1) + 16 + 'px';
-			
+			obj.style.width = gameWidth - x + 'px';
 			}
 		else{
 			movex();
