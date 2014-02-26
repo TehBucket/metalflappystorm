@@ -4,10 +4,8 @@ var pY = 1; //player's Y position
 var grounded = 0; //whether player is in air or grounded
 var jumping = 0; //whether jump lerping is going on or just falling
 var jumpLERP;
-var scroll = 0; //may be removed when i make things better
 var time = 0; //how many frames have gone by since load
 var animateDelay = 0; //i rreally need to stop with the globals
-
 var player = document.getElementById('player');
 var gameFrame = document.getElementById('gameFrame');
 var scrollingStuff = document.getElementsByClassName('scroll');
@@ -27,6 +25,7 @@ gameFrame.style.width = gameWidth + 'px';
 var counters = { //lazy way to stop overusing globals
 blockD: 150,
 spriteN: 4,
+scroll: 0
 }
 
 //will create random pillar block
@@ -112,7 +111,7 @@ var shoot = function(y, o){
 
 //changes the Graphics every update
 var graphics = function(){
-	//Animate
+	//Animate player
 	animateDelay = animateDelay + 1;
 	if(animateDelay >= 10){animateDelay = 0;}
 	orientation = 0;
@@ -125,10 +124,10 @@ var graphics = function(){
 
 	//scroll background
 	for(var i = 0; i < scrollingStuff.length;i++){
-		scrollingStuff[i].style.backgroundPosition = scroll + 'px' + ' 0px';
+		scrollingStuff[i].style.backgroundPosition = counters.scroll + 'px' + ' 0px';
 		}
-	scroll = scroll + scrollSpeed;
-	if(scroll >= 100){scroll = 0;}
+	counters.scroll = counters.scroll + scrollSpeed;
+	if(counters.scroll >= 100){counters.scroll = 0;}
 }
 
 var blockSpawn = function(){
@@ -209,7 +208,7 @@ var update = function(){
 	blockMove();
 	bulletMove();
 	graphics();
-	statusBar.innerHTML = 'Beep. Press Z to jump, X to switch gravity. Score: ' + score;
+	statusBar.innerHTML = 'Beep. Press Z to jump, X to switch gravity, C shoots. Score: ' + score;
 	time = time + 1; //time is a var used by other things but never changed anywhere else
 }
 
@@ -219,7 +218,7 @@ var int=self.setInterval(function(){update()},frameSpeed);
 //resets all values, like refreshing the page, called at death
 var resetAll = function (){
 	score = 0;
-	statust = "Beep. Press Z to jump, X to switch gravity." + score;
+	statust = "Beep. Press Z to jump, X to switch gravity, C shoots. Score: " + score;
 	gravity = 1;
 	pY = 1;
 	grounded = 0;
