@@ -10,7 +10,8 @@ var player = document.getElementById('player');
 var gameFrame = document.getElementById('gameFrame');
 var scrollingStuff = document.getElementsByClassName('scroll');
 var statusBar = document.getElementById('status');
-
+var highScoreBar = document.getElementById('highScore');
+var highScore = 0;
 
 
 //static variables to change when tweaking
@@ -127,7 +128,7 @@ var graphics = function(){
 		scrollingStuff[i].style.backgroundPosition = counters.scroll + 'px' + ' 0px';
 		}
 	counters.scroll = counters.scroll + scrollSpeed;
-	if(counters.scroll >= 100){counters.scroll = 0;}
+	if(counters.scroll >= 31){counters.scroll = 0;}
 }
 
 var blockSpawn = function(){
@@ -202,6 +203,7 @@ var colission = function(x, h, o){
 	}
 }
 
+
 var update = function(){
 	gravitate();
 	blockSpawn();
@@ -217,6 +219,8 @@ var int=self.setInterval(function(){update()},frameSpeed);
 
 //resets all values, like refreshing the page, called at death
 var resetAll = function (){
+	if(score > highScore){highScore = score;}
+	highScoreBar.innerHTML = 'High Score: '+highScore;
 	score = 0;
 	statust = "Beep. Press Z to jump, X to switch gravity, C shoots. Score: " + score;
 	gravity = 1;
