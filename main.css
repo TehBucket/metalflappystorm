@@ -16,9 +16,6 @@ font-size:16pt;
 
 .status{
 font-style:italic;
-}
-
-#highScore{
 font-weight:bold;
 }
 
@@ -29,10 +26,10 @@ font-weight:bold;
 #player{
 position:relative;
 left:30px;
-width:24px;
+width:32px;
 height:32px;
 background-image:url('images/player.png');
-background-position:48px 0px;
+background-position:128px 0px;
 }
 
 #gameFrame{

@@ -10,7 +10,6 @@ var player = document.getElementById('player');
 var gameFrame = document.getElementById('gameFrame');
 var scrollingStuff = document.getElementsByClassName('scroll');
 var statusBar = document.getElementById('status');
-var highScoreBar = document.getElementById('highScore');
 var highScore = 0;
 
 
@@ -26,7 +25,8 @@ gameFrame.style.width = gameWidth + 'px';
 var counters = { //lazy way to stop overusing globals
 blockD: 150,
 spriteN: 4,
-scroll: 0
+scroll: 0,
+dying: 0,
 }
 
 //will create random pillar block
@@ -40,9 +40,15 @@ var blockDefault = function(){
 
 var bulletDefault = function(y, o){
 	this.y = y;
-	if(o==1){this.x = 42;}
+	if(o==1){this.x = 55;}
 	else{this.x = 350;}
 	this.o = o;
+	this.alive = 1;
+}
+
+var enemyDefault = function(){
+	this.y = Math.floor(Math.random()*(gameHeight + 1));
+	this.x = gameWidth;
 	this.alive = 1;
 }
 
@@ -121,33 +127,39 @@ var graphics = function(){
 		counters.spriteN = counters.spriteN + 1;
 		if(counters.spriteN >= 4){counters.spriteN = 0;}
 		}
-	player.style.backgroundPosition = (counters.spriteN+1)*24 +1 + 'px ' + orientation + 'px'; //eww
+	player.style.backgroundPosition = (counters.spriteN+1)*32 + 'px ' + orientation + 'px'; //eww
 
 	//scroll background
 	for(var i = 0; i < scrollingStuff.length;i++){
-		scrollingStuff[i].style.backgroundPosition = counters.scroll + 'px' + ' 0px';
+		var y = 0;
+		if(i == 0){y = -1*pY/8;} //rotoscopishes background with player movement
+		scrollingStuff[i].style.backgroundPosition = counters.scroll + 'px' + ' '+y+'px';
 		}
 	counters.scroll = counters.scroll + scrollSpeed;
-	if(counters.scroll >= 31){counters.scroll = 0;}
+	if(counters.scroll <= -32){counters.scroll = 0;}
 }
 
 var blockSpawn = function(){
 counters.blockD = counters.blockD + 1;
 if(counters.blockD >= 149){
-	blocks.push(new blockDefault());
-	var div = document.createElement("div");
-	var q = blocks.length - 1;
-	div.style.left = blocks[q].x + 'px';
-	div.style.height = blocks[q].height + 'px';
-	if(blocks[q].orientation == 1){div.style.top = '10px';}
-	else{div.style.top = gameHeight - blocks[q].height + 'px';}
-	div.setAttribute('class', 'block');
-	div.setAttribute('id', 'block' + q);
-	gameFrame.appendChild(div);
-	counters.blockD = 0;
+	if(Math.random() > .85){
+		blocks.push(new blockDefault());
+		var div = document.createElement("div");
+		var q = blocks.length - 1;
+		div.style.left = blocks[q].x + 'px';
+		div.style.height = blocks[q].height + 'px';
+		if(blocks[q].orientation == 1){div.style.top = '10px';}
+		else{div.style.top = gameHeight - blocks[q].height + 'px';}
+		div.setAttribute('class', 'block');
+		div.setAttribute('id', 'block' + q);
+		gameFrame.appendChild(div);
+		counters.blockD = 0;
+		}
+	else{enemySpawn();}
 	}
 }
 
+//moves, scales, and checks player colission with every block
 var blockMove = function(){
 for(var i = 0; i < blocks.length;i++){
 	var movex = function(){
@@ -203,14 +215,23 @@ var colission = function(x, h, o){
 	}
 }
 
+var enemySpawn = function(){
+	
+}
+
+var enemyUpdate = function(){
+	
+}
+
 
 var update = function(){
 	gravitate();
 	blockSpawn();
 	blockMove();
+	enemyUpdate();
 	bulletMove();
 	graphics();
-	statusBar.innerHTML = 'Beep. Press Z to jump, X to switch gravity, C shoots. Score: ' + score;
+	statusBar.innerHTML = 'Score: ' + score + ' High Score: '+highScore;
 	time = time + 1; //time is a var used by other things but never changed anywhere else
 }
 
@@ -219,10 +240,8 @@ var int=self.setInterval(function(){update()},frameSpeed);
 
 //resets all values, like refreshing the page, called at death
 var resetAll = function (){
-	if(score > highScore){highScore = score;}
-	highScoreBar.innerHTML = 'High Score: '+highScore;
+	if(score > highScore){highScore = score; statusBar.style.backgroundColor = 'green';}
 	score = 0;
-	statust = "Beep. Press Z to jump, X to switch gravity, C shoots. Score: " + score;
 	gravity = 1;
 	pY = 1;
 	grounded = 0;
@@ -233,6 +252,7 @@ var resetAll = function (){
 	bullets = [];
 	blockDivs = document.getElementsByClassName('bullet');
 	while (blockDivs[0]){gameFrame.removeChild(blockDivs[0])};
+	statusBar.style.backgroundColor = 'transparent';
 }
  
  //inputs
