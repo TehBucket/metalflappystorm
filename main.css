@@ -32,6 +32,15 @@ background-image:url('images/player.png');
 background-position:128px 0px;
 }
 
+#playertest{
+position:relative;
+left:30px;
+width:32px;
+height:32px;
+background-image:url('images/player.png');
+background-position:-64px 0px;
+}
+
 #gameFrame{
 background-image:url('images/bg.png');
 }

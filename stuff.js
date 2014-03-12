@@ -5,7 +5,6 @@ var grounded = 0; //whether player is in air or grounded
 var jumping = 0; //whether jump lerping is going on or just falling
 var jumpLERP;
 var time = 0; //how many frames have gone by since load
-var animateDelay = 0; //i rreally need to stop with the globals
 var player = document.getElementById('player');
 var gameFrame = document.getElementById('gameFrame');
 var scrollingStuff = document.getElementsByClassName('scroll');
@@ -28,6 +27,7 @@ spriteN: 4,
 scroll: 0,
 dying: 0,
 scoreFlash: 0,
+animateDelay: 0,
 }
 
 //hex of colours to change styles (strings)
@@ -125,15 +125,13 @@ var shoot = function(y, o){
 //changes the Graphics every update
 var graphics = function(){
 	//Animate player
-	animateDelay = animateDelay + 1;
-	if(animateDelay >= 10){animateDelay = 0;}
-	orientation = 0;
-	if(gravity==-1){orientation = 32} //32 pixels down in spritesheet is upside down version
-	if(grounded == 1 && animateDelay == 0){
-		counters.spriteN = counters.spriteN + 1;
-		if(counters.spriteN >= 4){counters.spriteN = 0;}
+	counters.animateDelay = counters.animateDelay + 1;
+	if(counters.animateDelay >= 10){counters.animateDelay = 0;}
+	if(grounded == 1 && counters.animateDelay == 0){
+		counters.spriteN -= 1;
+		if(counters.spriteN <= 0){counters.spriteN = 4;}
 		}
-	player.style.backgroundPosition = (counters.spriteN+1)*32 + 'px ' + orientation + 'px'; //eww
+			player.style.backgroundPosition = (counters.spriteN)*-32 + 'px ' + (gravity - 1)*16 + 'px'; //eww
 
 	//scroll background
 	for(var i = 0; i < scrollingStuff.length;i++){
@@ -230,6 +228,7 @@ var enemyUpdate = function(){
 }
 
 var dying = function(){
+	//flashes score on high score
 	if(score > highScore){
 		highScore = score;
 		statusBar.style.color = 'red';
@@ -240,8 +239,16 @@ var dying = function(){
 			else{statusBar.style.color = 'black';}
 			counters.scoreFlash += 1;
 			}
-
-
+	if(counters.dying == 1){ //resets counter from normal animation
+		counters.animateDelay = 0;
+		counters.spriteN = 7;
+		}
+	if(counters.animateDelay >= 6){
+		counters.animateDelay = 0;
+		player.style.backgroundPosition = (counters.spriteN)*-32 + 'px ' + (gravity - 1)*16 + 'px';
+		counters.spriteN += 1;
+		}
+	counters.animateDelay += 1;
 	counters.dying += 1;
 }
 
@@ -274,6 +281,7 @@ var resetAll = function (){
 	grounded = 0;
 	jumping = 0;
 	time = 0;
+	counters.spriteN = 4;
 	blocks = [];
 	var blockDivs = document.getElementsByClassName('block');
 	while (blockDivs[0]){gameFrame.removeChild(blockDivs[0])}; //thanks stackoverflow
