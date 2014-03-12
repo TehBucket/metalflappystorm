@@ -186,7 +186,8 @@ for(var i = 0; i < blocks.length;i++){
 			movex();
 			obj.style.width = gameWidth - x + 'px';
 			}
-		else if(x == 30){ // player's X, checks if player is colliding
+		//COLISSION
+		else if(x > 14 && x < 46){ // approximately player's X, checks if player is colliding
 			movex();
 			colission(x, blocks[i].height, blocks[i].orientation);
 		}
@@ -206,12 +207,16 @@ var colission = function(x, h, o){
 	if(o == 1){
 		//checks blocks that hang from ceiling
 		if(pY < h){death();}
-		else{score++;}
-	}
+		else{
+			if(x == 44){score++}
+			}
+		}
 	//checks blocks that grow from floor
 	else{
-	if(pY > gameHeight - h){death();}
-	else{score++}
+	if(pY > gameHeight - h - 32){death();}
+	else{
+		if(x == 44){score++}
+		}
 	}
 }
 
