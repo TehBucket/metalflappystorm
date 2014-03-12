@@ -27,6 +27,12 @@ blockD: 150,
 spriteN: 4,
 scroll: 0,
 dying: 0,
+scoreFlash: 0,
+}
+
+//hex of colours to change styles (strings)
+var colors = {
+player1: '#ea7767', //orange
 }
 
 //will create random pillar block
@@ -186,8 +192,8 @@ for(var i = 0; i < blocks.length;i++){
 			movex();
 			obj.style.width = gameWidth - x + 'px';
 			}
-		//COLISSION
-		else if(x > 14 && x < 46){ // approximately player's X, checks if player is colliding
+		//COLISSION X
+		else if(x > 14 && x < 62){ // approximately player's X, checks if player is colliding
 			movex();
 			colission(x, blocks[i].height, blocks[i].orientation);
 		}
@@ -198,22 +204,17 @@ for(var i = 0; i < blocks.length;i++){
 }
 }
 
-// freezes game, plays death animation, resets.
-var death = function(){
-	resetAll();
-}
-
 var colission = function(x, h, o){
 	if(o == 1){
 		//checks blocks that hang from ceiling
-		if(pY < h){death();}
+		if(pY < h - 10){counters.dying = 1;}
 		else{
 			if(x == 44){score++}
 			}
 		}
 	//checks blocks that grow from floor
 	else{
-	if(pY > gameHeight - h - 32){death();}
+		if(pY > gameHeight - h - 32 - 20){counters.dying = 1;}
 	else{
 		if(x == 44){score++}
 		}
@@ -228,36 +229,58 @@ var enemyUpdate = function(){
 	
 }
 
+var dying = function(){
+	if(score > highScore){
+		highScore = score;
+		statusBar.style.color = 'red';
+		counters.scoreFlash = 1;
+		}
+	if(counters.dying == 15 * counters.scoreFlash){
+			if(statusBar.style.color == 'black'){statusBar.style.color = 'red';}
+			else{statusBar.style.color = 'black';}
+			counters.scoreFlash += 1;
+			}
+
+
+	counters.dying += 1;
+}
 
 var update = function(){
-	gravitate();
-	blockSpawn();
-	blockMove();
-	enemyUpdate();
-	bulletMove();
-	graphics();
-	statusBar.innerHTML = 'Score: ' + score + ' High Score: '+highScore;
+	if(counters.dying == 0){
+		gravitate();
+		blockSpawn();
+		blockMove();
+		enemyUpdate();
+		bulletMove();
+		graphics();
+		statusBar.innerHTML = 'Score: ' + score + ' High Score: '+highScore;
+		}
+	else if(counters.dying >= 90){resetAll();}
+	else{
+		dying();
+		}
 	time = time + 1; //time is a var used by other things but never changed anywhere else
 }
 
 //does each frame at interval
-var int=self.setInterval(function(){update()},frameSpeed);
+var int = self.setInterval(function(){update()},frameSpeed);
 
 //resets all values, like refreshing the page, called at death
 var resetAll = function (){
-	if(score > highScore){highScore = score; statusBar.style.backgroundColor = 'green';}
+	counters.dying = 0;
 	score = 0;
 	gravity = 1;
 	pY = 1;
 	grounded = 0;
 	jumping = 0;
+	time = 0;
 	blocks = [];
 	var blockDivs = document.getElementsByClassName('block');
 	while (blockDivs[0]){gameFrame.removeChild(blockDivs[0])}; //thanks stackoverflow
 	bullets = [];
 	blockDivs = document.getElementsByClassName('bullet');
 	while (blockDivs[0]){gameFrame.removeChild(blockDivs[0])};
-	statusBar.style.backgroundColor = 'transparent';
+	statusBar.style.color = 'black';
 }
  
  //inputs
