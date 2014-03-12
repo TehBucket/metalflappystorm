@@ -8,6 +8,7 @@ var scroll = 0; //may be removed when i make things better
 var time = 0; //how many frames have gone by since load
 var spriteN = 4;
 var animateDelay = 0; //i rreally need to stop with the globals
+var previousBlock = 0;
 
 var player = document.getElementById('player');
 var gameFrame = document.getElementById('gameFrame');
@@ -32,9 +33,10 @@ blockD: 150,
 var blockDefault = function(){ //will create random pillar block
 	this.x = gameWidth;
 	this.height = Math.floor(Math.random()*(175 - 85 + 1) + 85); //thank you MDN
-	this.orientation = Math.floor(Math.random()*(1 - 0 + 1) + 0);
+	this.orientation = previousBlock ? 0 : 1;
 	this.alive = 1;
 	this.width = 16; //pixel width of image for scaling management and such
+	previousBlock = this.orientation;
 }
 
 var blocks = [];
