@@ -137,7 +137,7 @@ var bulletMove = function(){
 					}
 				}
 			}
-		else if(bullets[i].o == -1){ //with player
+		else if(bullets[i].o == -2){ //with player
 			if(y >= pY+4 && y <= pY+28 && x >= 34 && x <= 55){counters.dying = 1}
 			}
 		if(x < 0 || x > gameWidth && bullets[i].alive){
