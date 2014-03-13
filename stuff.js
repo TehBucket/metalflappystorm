@@ -19,7 +19,7 @@ var enemies = [];
 var frameSpeed = 2; // speed of update(), smaller is faster.
 var scrollSpeed = -1;
 var fallSpeed = 2;
-var spawnRate = .15; // .95 = 95% blocks 5% enemies
+var spawnRate = .75; // .95 = 95% blocks 5% enemies
 var difficulty = 149; // smaller is harder, 150 = enemy or block spawns every 150 frames
 var enemyFireRate = 200; //how many frames between enemy shots
 var maxEnemies = 3; //keep under 3
