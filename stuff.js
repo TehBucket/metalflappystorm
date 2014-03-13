@@ -96,6 +96,7 @@ player.style.top = pY + "px";
 var dash = function(){
 	scrollSpeed = -2;
 	dashing = 1;
+	counters.dashTimer = 0;
 }
 
 var flipGravity = function(){
