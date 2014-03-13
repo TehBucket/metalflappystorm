@@ -24,7 +24,7 @@ font-weight:bold;
 }
 
 #player{
-position:relative;
+position:fixed;
 left:30px;
 width:32px;
 height:32px;
@@ -68,7 +68,6 @@ width:16px;
 
 .bullet{
 position:fixed;
-background-image:url('images/bullet.png');
 width:8px;
 height:8px;
 }
