@@ -19,7 +19,7 @@ var enemies = [];
 var frameSpeed = 2; // speed of update(), smaller is faster.
 var scrollSpeed = -1;
 var fallSpeed = 2;
-var spawnRate = .75; // .95 = 95% blocks 5% enemies
+var spawnRate = .15; // .95 = 95% blocks 5% enemies
 var difficulty = 149; // smaller is harder, 150 = enemy or block spawns every 150 frames
 var enemyFireRate = 200; //how many frames between enemy shots
 var maxEnemies = 3; //keep under 3
@@ -44,7 +44,7 @@ enemy3: 0,
 //will create random pillar block
 var blockDefault = function(){ 
 	this.x = gameWidth;
-	this.height = Math.floor(Math.random()*(175 - 85 + 1) + 85); //thank you MDN
+	this.height = Math.floor(Math.random()*(150 - 85 + 1) + 85); //thank you MDN
 	this.orientation = Math.floor(Math.random()*(1 - 0 + 1) + 0);
 	this.alive = 1;
 	this.width = 16; //pixel width of image for scaling management and such
@@ -67,6 +67,7 @@ var enemyDefault = function(){
 	this.frame = 0;
 	this.frameDelay = 0;
 	this.fireDelay = 40;
+	this.deathDelay = 0;
 	if(counters.enemy1 == 0){this.position = 1;}
 	else if(counters.enemy2 == 0){this.position = 2;}
 	else if(counters.enemy3 == 0){this.position = 3;}
@@ -122,9 +123,9 @@ var bulletMove = function(){
 		if(bullets[i].o == 1){ //with enemy
 			for(var i2 = 0;i2 < enemies.length;i2++){
 				if(enemies[i2].alive == 1 && y >= enemies[i2].y+4 && y <= enemies[i2].y+28 && x == enemies[i2].x){
-					enemies[i2].alive = 0;
-					var enemyi2 = document.getElementById('enemy' + i2);
-					gameFrame.removeChild(enemyi2);
+					enemies[i2].alive = -1;
+					enemies[i2].frameDelay = 20;
+					enemies[i2].frame = 8;
 					gameFrame.removeChild(obj);
 					bullets[i].alive = 0;
 					counters.enemies -= 1;
@@ -166,7 +167,7 @@ var graphics = function(){
 		counters.spriteN -= 1;
 		if(counters.spriteN <= 0){counters.spriteN = 4;}
 		}
-			player.style.backgroundPosition = (counters.spriteN)*-32 + 'px ' + (gravity - 1)*16 + 'px'; //eww
+			player.style.backgroundPosition = (counters.spriteN)*-32 + 'px ' + (gravity - 1)*16 + 'px';
 
 	//scroll background
 	for(var i = 0; i < scrollingStuff.length;i++){
@@ -221,7 +222,7 @@ for(var i = 0; i < blocks.length;i++){
 				obj.style.backgroundPosition = w + x + "px 0px";
 				}
 		}
-		else if(x >= gameWidth - w){ //scales to fake entering frame
+		else if(x > gameWidth - w){ //scales to fake entering frame
 			movex();
 			obj.style.width = gameWidth - x + 'px';
 			}
@@ -274,7 +275,7 @@ var enemySpawn = function(){
 //moves, scales, animates, and ai's each alive enemy
 var enemyUpdate = function(){
 	for(var i = 0; i < enemies.length;i++){
-		if(enemies[i].alive ==1){
+		if(enemies[i].alive !=0){
 			var obj = document.getElementById('enemy' + i);
 			if(enemies[i].x >= gameWidth - 42*enemies[i].position){ //slides enemy on x
 				enemies[i].x += scrollSpeed;
@@ -284,13 +285,13 @@ var enemyUpdate = function(){
 					}
 				}
 			else{
-			if(enemies[i].frameDelay == 20){ //animation
+			if(enemies[i].frameDelay == 20 && enemies[i].alive == 1){ //animation
 				enemies[i].frame -= 1;
-				if(enemies[i].frame <= 1){enemies[i].frame == 11}
+				if(enemies[i].frame <= 9){enemies[i].frame = 19}
 				enemies[i].frameDelay = 0;
 				}
 			enemies[i].frameDelay += 1; //shooting
-			if(enemies[i].fireDelay >= enemyFireRate){
+			if(enemies[i].fireDelay >= enemyFireRate && enemies[i].alive == 1){
 					if(enemies[i].y == pY){
 						shoot(enemies[i].x, enemies[i].y + 14, -1)
 						enemies[i].fireDelay = 0;
@@ -298,6 +299,20 @@ var enemyUpdate = function(){
 				}
 			else{enemies[i].fireDelay +=1;}
 			}
+			if(enemies[i].alive == -1){ //death animation, everything else null
+				enemies[i].x -= 1;
+				if(enemies[i].frameDelay >= 20){
+						enemies[i].frame -= 1;
+						enemies[i].frameDelay = 0;
+						}
+				//enemies[i].frameDelay +=1;
+				enemies[i].deathDelay +=1;
+				
+				if(enemies[i].frame <= 1){
+					gameFrame.removeChild(obj);
+					enemies[i].alive = 0;
+					}
+				}
 		
 		enemies[i].y += gravity;
 		if(enemies[i].y >= gameHeight - 32){enemies[i].y = gameHeight - 32;}
@@ -382,9 +397,9 @@ var resetAll = function (){
  
  //inputs
 window.addEventListener("keydown", function(e){
-	if(e.keyCode == 90){jump()}
-	else if(e.keyCode == 88){flipGravity()}
-	else if(e.keyCode == 67){shoot(55, pY + 12 - 2*gravity, 1)}
+	//if(e.keyCode == 67){jump()}
+	if(e.keyCode == 90){flipGravity()}
+	else if(e.keyCode == 88){shoot(55, pY + 12 - 2*gravity, 1)}
 }
 , false);
 
