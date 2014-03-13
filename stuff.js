@@ -2,8 +2,7 @@ var score = 0
 var gravity = 1; //either -1 or 1, gravity can flip
 var pY = 1; //player's Y position
 var grounded = 0; //whether player is in air or grounded
-var jumping = 0; //whether jump lerping is going on or just falling
-var jumpLERP;
+var dashing = 0; //you know i'm dashing
 var time = 0; //how many frames have gone by since load
 var player = document.getElementById('player');
 var gameFrame = document.getElementById('gameFrame');
@@ -19,10 +18,11 @@ var enemies = [];
 var frameSpeed = 2; // speed of update(), smaller is faster.
 var scrollSpeed = -1;
 var fallSpeed = 2;
-var spawnRate = .75; // .95 = 95% blocks 5% enemies
+var spawnRate = .80; // .95 = 95% blocks 5% enemies
 var difficulty = 149; // smaller is harder, 150 = enemy or block spawns every 150 frames
 var enemyFireRate = 200; //how many frames between enemy shots
 var maxEnemies = 3; //keep under 3
+var dashDistance = 50; //how many frames do you dash for
 var gameHeight = 250;
 var gameWidth = 400;
 gameFrame.style.height = gameHeight + 'px';
@@ -35,6 +35,7 @@ scroll: 0,
 dying: 0,
 scoreFlash: 0,
 animateDelay: 0,
+dashTimer: 0,
 enemies: 0,
 enemy1: 0, //whether or not there is an enemy in 1 of 3 spaces
 enemy2: 0,
@@ -73,15 +74,18 @@ var enemyDefault = function(){
 	else if(counters.enemy3 == 0){this.position = 3;}
 }
 
-//jumping and Falling, player only
+//Falling, player only
 var gravitate = function(){
-if(jumping == 1){
-	pY = pY + jumpLERP*gravity*-1;
-	if(jumpLERP >= 13){jumping = 0;}
-	jumpLERP = jumpLERP +1;
-	}
-else{
+if(dashing == 0){
 	pY = pY + 1*gravity*fallSpeed; //fall
+	}
+if(dashing == 1){
+	counters.dashTimer += 1;
+	if(counters.dashTimer >= dashDistance){
+		dashing = 0;
+		scrollSpeed = -1;
+		counters.dashTimer = 0;
+		}
 	}
 if(pY >= gameHeight - 32){pY = gameHeight - 32; grounded = 1; jumping = 0;}
 else if(pY <= 10){pY = 10; grounded = 1; jumping = 0;}
@@ -89,11 +93,9 @@ else if(pY <= 10){pY = 10; grounded = 1; jumping = 0;}
 player.style.top = pY + "px";
 }
 
-var jump = function(){
-jumping = 1;
-jumpLERP = 1;
-grounded = 0;
-counters.spriteN = 5;
+var dash = function(){
+	scrollSpeed = -2;
+	dashing = 1;
 }
 
 var flipGravity = function(){
@@ -110,7 +112,7 @@ var bulletMove = function(){
 		var y = bullets[i].y;
 		var o = bullets[i].o;
 		var movex = function(){
-			x = x + o;
+			x = x + o*-scrollSpeed;
 			bullets[i].x = x;
 			obj.style.left = x + 'px';
 		}
@@ -163,11 +165,12 @@ var graphics = function(){
 	//Animate player
 	counters.animateDelay = counters.animateDelay + 1;
 	if(counters.animateDelay >= 10){counters.animateDelay = 0;}
-	if(grounded == 1 && counters.animateDelay == 0){
+	if(grounded == 1 && dashing == 0 && counters.animateDelay == 0){
 		counters.spriteN -= 1;
 		if(counters.spriteN <= 0){counters.spriteN = 4;}
 		}
-			player.style.backgroundPosition = (counters.spriteN)*-32 + 'px ' + (gravity - 1)*16 + 'px';
+		if(dashing ==1){counters.spriteN = 6}
+		player.style.backgroundPosition = (counters.spriteN)*-32 + 'px ' + (gravity - 1)*16 + 'px';
 
 	//scroll background
 	for(var i = 0; i < scrollingStuff.length;i++){
@@ -180,7 +183,7 @@ var graphics = function(){
 }
 
 var blockSpawn = function(){
-counters.blockD = counters.blockD + 1;
+counters.blockD = counters.blockD + -scrollSpeed;
 if(counters.blockD >= difficulty){
 	if(Math.random() < spawnRate){
 		blocks.push(new blockDefault());
@@ -203,7 +206,7 @@ if(counters.blockD >= difficulty){
 var blockMove = function(){
 for(var i = 0; i < blocks.length;i++){
 	var movex = function(){
-		x = x - 1;
+		x = x + scrollSpeed;
 		blocks[i].x = x;
 		obj.style.left = x + 'px';
 		}
@@ -280,12 +283,13 @@ var enemyUpdate = function(){
 			if(enemies[i].x >= gameWidth - 42*enemies[i].position){ //slides enemy on x
 				enemies[i].x += scrollSpeed;
 				if(enemies[i].width < 32){ //scales x to fake entering frame
-					enemies[i].width += 1;
+					enemies[i].width -= scrollSpeed;
 					obj.style.width = enemies[i].width + 'px';
 					}
+				else{enemies[i].width = 32}
 				}
 			else{
-			if(enemies[i].frameDelay == 20 && enemies[i].alive == 1){ //animation
+			if(enemies[i].frameDelay >= 20/-scrollSpeed && enemies[i].alive == 1){ //animation
 				enemies[i].frame -= 1;
 				if(enemies[i].frame <= 9){enemies[i].frame = 19}
 				enemies[i].frameDelay = 0;
@@ -300,12 +304,11 @@ var enemyUpdate = function(){
 			else{enemies[i].fireDelay +=1;}
 			}
 			if(enemies[i].alive == -1){ //death animation, everything else null
-				enemies[i].x -= 1;
+				enemies[i].x += scrollSpeed;
 				if(enemies[i].frameDelay >= 20){
 						enemies[i].frame -= 1;
 						enemies[i].frameDelay = 0;
 						}
-				//enemies[i].frameDelay +=1;
 				enemies[i].deathDelay +=1;
 				
 				if(enemies[i].frame <= 1){
@@ -379,8 +382,11 @@ var resetAll = function (){
 	grounded = 0;
 	jumping = 0;
 	time = 0;
+	dashing = 0;
+	scrollSpeed = -1;
 	counters.spriteN = 4;
 	counters.enemies = 0;
+	counters.dashTimer = 0;
 	counters.enemy1 =0;counters.enemy2=0;counters.enemy3=0;
 	blocks = [];
 	var Divs = document.getElementsByClassName('block');
@@ -397,9 +403,9 @@ var resetAll = function (){
  
  //inputs
 window.addEventListener("keydown", function(e){
-	//if(e.keyCode == 67){jump()}
 	if(e.keyCode == 90){flipGravity()}
 	else if(e.keyCode == 88){shoot(55, pY + 12 - 2*gravity, 1)}
+	else if(e.keyCode == 67){dash();}
 }
 , false);
 
