@@ -298,7 +298,7 @@ var enemyUpdate = function(){
 			enemies[i].frameDelay += 1; //shooting
 			if(enemies[i].fireDelay >= enemyFireRate && enemies[i].alive == 1){
 					if(enemies[i].y == pY){
-						shoot(enemies[i].x, enemies[i].y + 14, -1)
+						shoot(enemies[i].x, enemies[i].y + 14, -2)
 						enemies[i].fireDelay = 0;
 						}
 				}
