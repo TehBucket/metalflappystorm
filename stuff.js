@@ -11,6 +11,9 @@ var scrollingStuff = document.getElementsByClassName('scroll');
 var statusBar = document.getElementById('status');
 var highScore = 0;
 
+var blocks = [];
+var bullets = [];
+var enemies = [];
 
 //static variables to change when tweaking
 var frameSpeed = 2; // speed of update(), smaller is faster.
@@ -28,11 +31,6 @@ scroll: 0,
 dying: 0,
 scoreFlash: 0,
 animateDelay: 0,
-}
-
-//hex of colours to change styles (strings)
-var colors = {
-player1: '#ea7767', //orange
 }
 
 //will create random pillar block
@@ -53,29 +51,27 @@ var bulletDefault = function(y, o){
 }
 
 var enemyDefault = function(){
-	this.y = Math.floor(Math.random()*(gameHeight + 1));
+	if(gravity == -1){this.y = 10;}
+	else{this.y = gameHeight - 32;}
 	this.x = gameWidth;
 	this.alive = 1;
+	this.frame = 0;
 }
-
-var blocks = [];
-var bullets = [];
 
 //jumping and Falling
 var gravitate = function(){
 if(jumping == 1){
-pY = pY + jumpLERP*gravity*-1;
-if(jumpLERP >= 16){jumping = 0;}
-jumpLERP = jumpLERP +2;
-}
+	pY = pY + jumpLERP*gravity*-1;
+	if(jumpLERP >= 16){jumping = 0;}
+	jumpLERP = jumpLERP +2;
+	}
 else{
-pY = pY + 1*gravity*fallSpeed; //fall
-}
+	pY = pY + 1*gravity*fallSpeed; //fall
+	}
 if(pY >= gameHeight -50){pY = gameHeight -50; grounded = 1; jumping = 0;} //50px difference between real floor and seen floor :P
 else if(pY <= -10){pY = -10; grounded = 1; jumping = 0;}
 
 player.style.top = pY + "px";
-
 }
 
 var jump = function(){
@@ -146,7 +142,7 @@ var graphics = function(){
 var blockSpawn = function(){
 counters.blockD = counters.blockD + 1;
 if(counters.blockD >= 149){
-	if(Math.random() > .85){
+	if(Math.random() < .25){
 		blocks.push(new blockDefault());
 		var div = document.createElement("div");
 		var q = blocks.length - 1;
@@ -157,7 +153,7 @@ if(counters.blockD >= 149){
 		div.setAttribute('class', 'block');
 		div.setAttribute('id', 'block' + q);
 		gameFrame.appendChild(div);
-		counters.blockD = 0;
+		counters.blockD = 0; //reset spawn timer
 		}
 	else{enemySpawn();}
 	}
@@ -220,11 +216,26 @@ var colission = function(x, h, o){
 }
 
 var enemySpawn = function(){
-	
+	enemies.push(new enemyDefault());
+	var div = document.createElement("div");
+	var q = enemies.length - 1;
+	div.style.left = enemies[q].x + 'px';
+	div.style.top = enemies[q].y + 'px';
+	div.setAttribute('class', 'enemy');
+	div.setAttribute('id', 'enemy' + q);
+	gameFrame.appendChild(div);
+	counters.blockD = 0; //reset spawn timer
 }
 
 var enemyUpdate = function(){
+	for(var i = 0; i < enemies.length;i++){
+	var obj = document.getElementById('enemy' + i);
+	if(enemies[i].x >= gameWidth - 100){enemies[i].x += scrollSpeed;}
+	obj.style.left = enemies[i].x + 'px';
+	obj.style.backgroundPosition = enemies[i].frame*32+ 'px ' + (gravity - 1)*16 + 'px';
+	enemies[i].frame += 1;
 	
+	}
 }
 
 var dying = function(){
@@ -243,7 +254,7 @@ var dying = function(){
 		counters.animateDelay = 0;
 		counters.spriteN = 7;
 		}
-	if(counters.animateDelay >= 6){
+	if(counters.animateDelay >= 8){
 		counters.animateDelay = 0;
 		player.style.backgroundPosition = (counters.spriteN)*-32 + 'px ' + (gravity - 1)*16 + 'px';
 		counters.spriteN += 1;
@@ -262,7 +273,7 @@ var update = function(){
 		graphics();
 		statusBar.innerHTML = 'Score: ' + score + ' High Score: '+highScore;
 		}
-	else if(counters.dying >= 90){resetAll();}
+	else if(counters.dying >= 120){resetAll();}
 	else{
 		dying();
 		}
@@ -283,12 +294,16 @@ var resetAll = function (){
 	time = 0;
 	counters.spriteN = 4;
 	blocks = [];
-	var blockDivs = document.getElementsByClassName('block');
-	while (blockDivs[0]){gameFrame.removeChild(blockDivs[0])}; //thanks stackoverflow
+	var Divs = document.getElementsByClassName('block');
+	while (Divs[0]){gameFrame.removeChild(Divs[0])}; //thanks stackoverflow
 	bullets = [];
-	blockDivs = document.getElementsByClassName('bullet');
-	while (blockDivs[0]){gameFrame.removeChild(blockDivs[0])};
+	Divs = document.getElementsByClassName('bullet');
+	while (Divs[0]){gameFrame.removeChild(Divs[0])};
+	enemies = [];
+	Divs = document.getElementsByClassName('enemy');
+	while (Divs[0]){gameFrame.removeChild(Divs[0])};
 	statusBar.style.color = 'black';
+	counters.scoreFlash = 0;
 }
  
  //inputs

@@ -15,7 +15,7 @@ font-size:16pt;
 }
 
 .status{
-font-style:italic;
+font-family:sans-serif;
 font-weight:bold;
 }
 
@@ -62,7 +62,7 @@ position:relative;
 
 .block{
 position:fixed;
-background-image:url('images/block2.png');
+background-image:url('images/block.png');
 width:16px;
 }
 
@@ -71,4 +71,11 @@ position:fixed;
 background-image:url('images/bullet.png');
 width:8px;
 height:8px;
+}
+
+.enemy{
+position:fixed;
+background-image:url('images/enemy.png');
+width:32px;
+height:32px;
 }
