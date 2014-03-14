@@ -8,6 +8,7 @@ var player = document.getElementById('player');
 var gameFrame = document.getElementById('gameFrame');
 var scrollingStuff = document.getElementsByClassName('scroll');
 var statusBar = document.getElementById('status');
+var controlsDisplay = document.getElementById('controls');
 var highScore = 0;
 
 var blocks = [];
@@ -23,6 +24,12 @@ var difficulty = 149; // smaller is harder, 150 = enemy or block spawns every 15
 var enemyFireRate = 200; //how many frames between enemy shots
 var maxEnemies = 3; //keep under 3
 var dashDistance = 50; //how many frames do you dash for
+//controls
+var controls = {
+	flipKey: 90, //z, flips gravity
+	shootKey: 88, //x
+	dashKey: 67,
+	}
 var gameHeight = 250;
 var gameWidth = 400;
 gameFrame.style.height = gameHeight + 'px';
@@ -403,15 +410,32 @@ var resetAll = function (){
 	statusBar.style.color = 'black';
 	counters.scoreFlash = 0;
 }
+
+//binds a key or resets
+var bind = function(action, keyCode){
+	if(action == "reset"){
+		controls.flipKey = 90; //z
+		controls.shootKey = 88; //x
+		controls.dashKey = 67; //c
+		controlsDisplay.innerHTML = "Beepaaa. Press "+String.fromCharCode(controls.flipKey)+" to switch gravity, "+String.fromCharCode(controls.shootKey)+" shoots, "+String.fromCharCode(controls.dashKey)+" to dash. -Teh_Bucket";
+		return "reset keys to defaults";
+		}
+	else{
+		
+		controls[action+"Key"] = keyCode;
+		controlsDisplay.innerHTML = "Beepaaa. Press "+String.fromCharCode(controls.flipKey)+" to switch gravity, "+String.fromCharCode(controls.shootKey)+" shoots, "+String.fromCharCode(controls.dashKey)+" to dash. -Teh_Bucket";
+		return "Set "+action+" to "+String.fromCharCode(keyCode);
+		}
+	}
  
  //inputs
 window.addEventListener("keydown", function(e){
-	if(e.keyCode == 90){flipGravity()}
-	else if(e.keyCode == 88 && counters.fireDelay >= 25){
+	if(e.keyCode == controls.flipKey){flipGravity()}
+	else if(e.keyCode == controls.shootKey && counters.fireDelay >= 25){
 		shoot(55, pY + 12 - 2*gravity, 1);
 		counters.fireDelay = 0;
 		}
-	else if(e.keyCode == 67){dash();}
+	else if(e.keyCode == controls.dashKey){dash();}
 }
 , false);
 
