@@ -36,6 +36,7 @@ dying: 0,
 scoreFlash: 0,
 animateDelay: 0,
 dashTimer: 0,
+fireDelay: 20, //to prevent bullet spamming thanks wiseman
 enemies: 0,
 enemy1: 0, //whether or not there is an enemy in 1 of 3 spaces
 enemy2: 0,
@@ -146,6 +147,7 @@ var bulletMove = function(){
 			}
 		}
 	}
+	counters.fireDelay += -scrollSpeed;
 }
 
 //creates bullet
@@ -405,7 +407,10 @@ var resetAll = function (){
  //inputs
 window.addEventListener("keydown", function(e){
 	if(e.keyCode == 90){flipGravity()}
-	else if(e.keyCode == 88){shoot(55, pY + 12 - 2*gravity, 1)}
+	else if(e.keyCode == 88 && counters.fireDelay >= 25){
+		shoot(55, pY + 12 - 2*gravity, 1);
+		counters.fireDelay = 0;
+		}
 	else if(e.keyCode == 67){dash();}
 }
 , false);
