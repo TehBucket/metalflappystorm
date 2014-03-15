@@ -10,6 +10,20 @@ var scrollingStuff = document.getElementsByClassName('scroll');
 var statusBar = document.getElementById('status');
 var controlsDisplay = document.getElementById('controls');
 var highScore = 0;
+var mute = true; //1 if 
+
+//sounds :D
+var wav ={
+	shoot: new Audio("sounds/shoot.wav"),
+	enemyShoot: new Audio("sounds/enemyShoot.wav"),
+	enemyDie: new Audio("sounds/enemyDie.wav"),
+	playerDie: new Audio("sounds/playerDie.wav"),
+	highScore1: new Audio("sounds/highScore1.wav"),
+	highScore2: new Audio("sounds/highScore2.wav"),
+	flip: new Audio("sounds/flip.wav"),
+	dash: new Audio("sounds/dash.wav"),
+	song: new Audio("sounds/song.wav"),
+	}
 
 var blocks = [];
 var bullets = [];
@@ -105,11 +119,13 @@ var dash = function(){
 	scrollSpeed = -2;
 	dashing = 1;
 	counters.dashTimer = 0;
+	if(!mute){wav.dash.play()}
 }
 
 var flipGravity = function(){
 gravity = gravity * -1;
 grounded = 0;
+if(!mute){wav.flip.play()}
 }
 
 //move, animate, collide
@@ -142,11 +158,12 @@ var bulletMove = function(){
 					counters.enemies -= 1;
 					counters['enemy'+enemies[i2].position] = 0;
 					score += 2;
+					if(!mute){wav.enemyDie.play()}
 					}
 				}
 			}
 		else if(bullets[i].o == -2){ //with player
-			if(y >= pY+4 && y <= pY+28 && x >= 34 && x <= 55){counters.dying = 1}
+			if(y >= pY+4 && y <= pY+28 && x >= 34 && x <= 55){counters.dying = 1;if(!mute){wav.playerDie.play()}}
 			}
 		if(x < 0 || x > gameWidth && bullets[i].alive){
 			gameFrame.removeChild(obj);
@@ -254,14 +271,14 @@ for(var i = 0; i < blocks.length;i++){
 var colission = function(x, h, o){
 	if(o == 1){
 		//checks blocks that hang from ceiling
-		if(pY < h + 10){counters.dying = 1;}
+		if(pY < h + 10){counters.dying = 1;if(!mute){wav.playerDie.play()}}
 		else{
 			if(x == 44){score++}
 			}
 		}
 	//checks blocks that grow from floor
 	else{
-		if(pY > gameHeight - h - 32){counters.dying = 1;}
+		if(pY > gameHeight - h - 32){counters.dying = 1;if(!mute){wav.playerDie.play()}}
 	else{
 		if(x == 44){score++}
 		}
@@ -307,7 +324,8 @@ var enemyUpdate = function(){
 			enemies[i].frameDelay += 1; //shooting
 			if(enemies[i].fireDelay >= enemyFireRate && enemies[i].alive == 1){
 					if(enemies[i].y == pY){
-						shoot(enemies[i].x, enemies[i].y + 14, -2)
+						shoot(enemies[i].x, enemies[i].y + 14, -2);
+						if(!mute){wav.enemyShoot.play()}
 						enemies[i].fireDelay = 0;
 						}
 				}
@@ -346,8 +364,8 @@ var dying = function(){
 		counters.scoreFlash = 1;
 		}
 	if(counters.dying == 15 * counters.scoreFlash){
-			if(statusBar.style.color == 'black'){statusBar.style.color = 'red';}
-			else{statusBar.style.color = 'black';}
+			if(statusBar.style.color == 'black'){statusBar.style.color = 'red';if(!mute){wav.highScore1.play()}}
+			else{statusBar.style.color = 'black';if(!mute){wav.highScore2.play()}}
 			counters.scoreFlash += 1;
 			}
 	if(counters.dying == 1){ //resets counter from normal animation
@@ -433,6 +451,7 @@ window.addEventListener("keydown", function(e){
 	if(e.keyCode == controls.flipKey){flipGravity()}
 	else if(e.keyCode == controls.shootKey && counters.fireDelay >= 25){
 		shoot(55, pY + 12 - 2*gravity, 1);
+		if(!mute){wav.shoot.play()}
 		counters.fireDelay = 0;
 		}
 	else if(e.keyCode == controls.dashKey){dash();}
