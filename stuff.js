@@ -133,7 +133,7 @@ var bulletMove = function(){
 		//collide
 		if(bullets[i].o == 1){ //with enemy
 			for(var i2 = 0;i2 < enemies.length;i2++){
-				if(enemies[i2].alive == 1 && y >= enemies[i2].y+4 && y <= enemies[i2].y+28 && x == enemies[i2].x){
+				if(enemies[i2].alive == 1 && y >= enemies[i2].y && y <= enemies[i2].y+32 && x >= enemies[i2].x && x <= enemies[i2].x+32){
 					enemies[i2].alive = -1;
 					enemies[i2].frameDelay = 20;
 					enemies[i2].frame = 8;
@@ -417,13 +417,13 @@ var bind = function(action, keyCode){
 		controls.flipKey = 90; //z
 		controls.shootKey = 88; //x
 		controls.dashKey = 67; //c
-		controlsDisplay.innerHTML = "Beepaaa. Press "+String.fromCharCode(controls.flipKey)+" to switch gravity, "+String.fromCharCode(controls.shootKey)+" shoots, "+String.fromCharCode(controls.dashKey)+" to dash. -Teh_Bucket";
+		controlsDisplay.innerHTML = "Beep. Press "+String.fromCharCode(controls.flipKey)+" to switch gravity, "+String.fromCharCode(controls.shootKey)+" shoots, "+String.fromCharCode(controls.dashKey)+" to dash. -Teh_Bucket";
 		return "reset keys to defaults";
 		}
 	else{
 		
 		controls[action+"Key"] = keyCode;
-		controlsDisplay.innerHTML = "Beepaaa. Press "+String.fromCharCode(controls.flipKey)+" to switch gravity, "+String.fromCharCode(controls.shootKey)+" shoots, "+String.fromCharCode(controls.dashKey)+" to dash. -Teh_Bucket";
+		controlsDisplay.innerHTML = "Beep. Press "+String.fromCharCode(controls.flipKey)+" to switch gravity, "+String.fromCharCode(controls.shootKey)+" shoots, "+String.fromCharCode(controls.dashKey)+" to dash. -Teh_Bucket";
 		return "Set "+action+" to "+String.fromCharCode(keyCode);
 		}
 	}
