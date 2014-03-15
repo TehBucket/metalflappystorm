@@ -78,3 +78,14 @@ background-image:url('images/enemy.png');
 width:32px;
 height:32px;
 }
+
+button{
+background-color:#adadad;
+font-family:Arial;
+font-size:14px;
+font-weight:bold;
+}
+
+.menu{
+
+}
