@@ -153,7 +153,7 @@ var bulletMove = function(){
 					enemies[i2].alive = -1;
 					enemies[i2].frameDelay = 20;
 					enemies[i2].frame = 8;
-					gameFrame.removeChild(obj);
+					if(bullets[i].alive ==1){gameFrame.removeChild(obj);} //had to add, every once in a while a bullet will hit 2 enemies in same frame
 					bullets[i].alive = 0;
 					counters.enemies -= 1;
 					counters['enemy'+enemies[i2].position] = 0;
