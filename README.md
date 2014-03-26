@@ -1,6 +1,6 @@
 metalflappystorm
 ================
 
-attempt at creating very simple game mechanics from scratch with html elements only
+attempt at creating very simple game mechanics from scratch with html elements
 
-TODO: implement dash (C) to survive situations currently impossible to survive
+Project at gh-pages branch
