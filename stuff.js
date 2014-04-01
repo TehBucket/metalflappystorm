@@ -22,7 +22,7 @@ var wav ={
 	highScore2: new Audio("sounds/highScore2.wav"),
 	flip: new Audio("sounds/flip.wav"),
 	dash: new Audio("sounds/dash.wav"),
-	song: new Audio("sounds/song.wav"),
+	song: new Audio("sounds/song.mp3"),
 	}
 
 var blocks = [];
