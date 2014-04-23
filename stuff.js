@@ -10,6 +10,8 @@ var scrollingStuff = document.getElementsByClassName('scroll');
 var statusBar = document.getElementById('status');
 var controlsDisplay = document.getElementById('controls');
 var highScore = 0;
+var lastFrame = new Date().getTime();
+var fpsLag = new Date().getTime();
 var mute = true; //1 if 
 
 //sounds :D
@@ -99,7 +101,7 @@ var enemyDefault = function(){
 //Falling, player only
 var gravitate = function(){
 if(dashing == 0){
-	pY = pY + 1*gravity*fallSpeed; //fall
+	pY = pY + 1*gravity*fallSpeed*-scrollSpeed; //fall
 	}
 if(dashing == 1){
 	counters.dashTimer += 1;
@@ -345,7 +347,7 @@ var enemyUpdate = function(){
 					}
 				}
 		
-		enemies[i].y += gravity;
+		enemies[i].y += gravity*-scrollSpeed;
 		if(enemies[i].y >= gameHeight - 32){enemies[i].y = gameHeight - 32;}
 		else if(enemies[i].y <= 10){enemies[i].y = 10;}
 		obj.style.backgroundPosition = enemies[i].frame*32+ 'px ' + (gravity - 1)*16 + 'px';
@@ -382,6 +384,8 @@ var dying = function(){
 }
 
 var update = function(){
+	scrollSpeed = -(new Date().getTime() - lastFrame)/5*(dashing+1);
+	lastFrame = new Date().getTime();
 	if(counters.dying == 0){
 		gravitate();
 		blockSpawn();
