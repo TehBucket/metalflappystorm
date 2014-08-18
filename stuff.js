@@ -384,8 +384,8 @@ var dying = function(){
 }
 
 var update = function(){
-	scrollSpeed = -(new Date().getTime() - lastFrame)/5*(dashing+1);
-	lastFrame = new Date().getTime();
+	// scrollSpeed = -(new Date().getTime() - lastFrame)/5*(dashing+1);   //fixed FPS, will have to wait till systems can work with it properly
+	// lastFrame = new Date().getTime();
 	if(counters.dying == 0){
 		gravitate();
 		blockSpawn();
